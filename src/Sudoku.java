@@ -8,6 +8,7 @@ public class Sudoku extends JFrame {
     private int[][] board;
     private int[][] solution;
     private  boolean[][] locked;
+    private  int level = 1;
     private JComboBox<String> difficultyComboBox;
     private JPanel gameBoard;
 
@@ -39,9 +40,30 @@ public class Sudoku extends JFrame {
             }
 
         });
+
+        String[] difficultyLevels = {"Easy", "Medium", "Hard"};
+        difficultyComboBox = new JComboBox<>(difficultyLevels);
+        difficultyComboBox.addActionListener(e -> {
+            String value = difficultyComboBox.getSelectedItem().toString();
+            if (value == "Easy") {
+                level = 1;
+            } else if (value == "Medium") {
+                level = 2;
+            } else {
+                level = 3;
+            }
+            gameBoard.removeAll();
+            generateBoard();
+
+            populateGameBoard(gameBoard, board);
+            gameBoard.revalidate();
+            gameBoard.repaint();
+        });
         JButton showButton = new JButton("Show Solution");
         JPanel controls = new JPanel(new FlowLayout());
 
+        controls.add(new JLabel("Difficulty:"));
+        controls.add(difficultyComboBox);
         controls.add(checkButton);
         controls.add(showButton);
         getContentPane().setLayout(new BorderLayout());
@@ -85,7 +107,18 @@ public class Sudoku extends JFrame {
             }
         }
 
-        int numLocked = 30;
+        int numLocked = 0;
+        switch (level) {
+            case 1:
+                numLocked = 30;
+                break;
+            case 2:
+                numLocked = 45;
+                break;
+            case 3:
+                numLocked = 60;
+                break;
+        }
 
         while (numLocked > 0) {
             int row = rand.nextInt(9);
