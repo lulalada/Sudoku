@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Random;
 
 public class Sudoku extends JFrame {
     private static final int BOARD_SIZE = 9;
@@ -16,18 +17,9 @@ public class Sudoku extends JFrame {
 
     public Sudoku() {
         gameBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            for (int col = 0; col < BOARD_SIZE; col++) {
+        generateBoard();
+        populateGameBoard(gameBoard, board);
 
-                JTextField textField = new JTextField();
-                textField.setHorizontalAlignment(JTextField.CENTER);
-                textField.setFont(new Font("Arial", Font.BOLD, 20));
-                textField.setEditable(true);
-                textField.setText(row + " " + col);
-
-                gameBoard.add(textField);
-            }
-        }
         JButton checkButton = new JButton("Check Solution");
         JButton showButton = new JButton("Show Solution");
         JPanel controls = new JPanel(new FlowLayout());
@@ -42,4 +34,98 @@ public class Sudoku extends JFrame {
         setSize(500, 500);
         setVisible(true);
     }
+
+    private void generateBoard() {
+        board = new int[BOARD_SIZE][BOARD_SIZE];
+        solution = new int[BOARD_SIZE][BOARD_SIZE];
+        locked = new boolean[BOARD_SIZE][BOARD_SIZE];
+        Random rand = new Random();
+
+
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                board[i][j] = 0;
+            }
+        }
+
+        for (int i = 0; i < BOARD_SIZE; i += SUBGRID_SIZE) {
+            for (int j = 0; j < BOARD_SIZE; j += SUBGRID_SIZE) {
+                int val = rand.nextInt(9) + 1;
+                if (isValid(i, j, val)) {
+                    board[i][j] = val;
+                }
+            }
+        }
+
+        if (!solve(0, 0)) {
+            generateBoard();
+        }
+
+    }
+    private boolean isValid(int row, int col, int val) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (board[row][i] == val || board[i][col] == val) {
+                return false;
+            }
+        }
+
+        int subgridRow = row - row % SUBGRID_SIZE;
+        int subgridCol = col - col % SUBGRID_SIZE;
+        for (int i = subgridRow; i < subgridRow + SUBGRID_SIZE; i++) {
+            for (int j = subgridCol; j < subgridCol + SUBGRID_SIZE; j++) {
+                if (board[i][j] == val) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean solve(int row, int col) {
+        if (row == BOARD_SIZE) {
+            row = 0;
+            if (++col == BOARD_SIZE) {
+                return true;
+            }
+        }
+
+        if (board[row][col] != 0) {
+            return solve(row + 1, col);
+        }
+
+        for (int val = 1; val <= 9; ++val) {
+            if (isValid(row, col, val)) {
+                board[row][col] = val;
+                if (solve(row + 1, col)) {
+                    return true;
+                }
+            }
+        }
+
+
+
+        board[row][col] = 0;
+        return false;
+    }
+
+    private void populateGameBoard(JPanel gameBoard, int[][] boardToPopulate) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+
+                JTextField textField = new JTextField();
+                textField.setHorizontalAlignment(JTextField.CENTER);
+                textField.setFont(new Font("Arial", Font.BOLD, 20));
+                textField.setEditable(true);
+                if (boardToPopulate[row][col] != 0) {
+                    textField.setText(String.valueOf(boardToPopulate[row][col]));
+                    textField.setEditable(false);
+                } else {
+                    textField.setText("");
+                }
+
+                gameBoard.add(textField);
+            }
+        }
+    }
 }
+
