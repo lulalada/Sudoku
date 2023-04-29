@@ -9,7 +9,7 @@ This is a simple Sudoku game developed in Java using Swing.
 * Open the project in your preferred Java IDE.
 * Compile and run the Sudoku.java file.
 
-#How to Play
+# How to Play
 
 * Choose the difficulty level from the drop-down menu.
 * Click on a cell to select it and enter a number between 1 and 9 using the keyboard.
