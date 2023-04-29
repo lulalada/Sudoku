@@ -8,7 +8,7 @@ public class Sudoku extends JFrame {
     private int[][] board;
     private int[][] solution;
     private  boolean[][] locked;
-
+    private JComboBox<String> difficultyComboBox;
     private JPanel gameBoard;
 
     public static void main(String[] args) {
@@ -21,6 +21,24 @@ public class Sudoku extends JFrame {
         populateGameBoard(gameBoard, board);
 
         JButton checkButton = new JButton("Check Solution");
+        checkButton.addActionListener(e -> {
+
+
+            if (!checkSolution()) {
+                JOptionPane.showMessageDialog(null,
+                        "Your solution is NOT correct!");
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Your solution is correct! Your score is ");
+
+                gameBoard.removeAll();
+                generateBoard();
+                populateGameBoard(gameBoard, board);
+                gameBoard.revalidate();
+
+            }
+
+        });
         JButton showButton = new JButton("Show Solution");
         JPanel controls = new JPanel(new FlowLayout());
 
@@ -77,6 +95,20 @@ public class Sudoku extends JFrame {
                 numLocked--;
                 board[row][col] = 0;
             }
+        }
+
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println("");
+        }
+        System.out.println(" ______________________ ");
+        for (int i = 0; i < solution.length; i++) {
+            for (int j = 0; j < solution.length; j++) {
+                System.out.print(solution[i][j] + " ");
+            }
+            System.out.println("");
         }
 
     }
@@ -144,6 +176,22 @@ public class Sudoku extends JFrame {
                 gameBoard.add(textField);
             }
         }
+    }
+
+    private boolean checkSolution() {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                Component component = gameBoard.getComponent(row * BOARD_SIZE + col);
+                if (component instanceof JTextField) {
+                    JTextField textField = (JTextField) component;
+                    String value = textField.getText();
+                    if (!value.equals(String.valueOf(solution[row][col]))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
 
