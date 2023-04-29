@@ -60,6 +60,13 @@ public class Sudoku extends JFrame {
             gameBoard.repaint();
         });
         JButton showButton = new JButton("Show Solution");
+        showButton.addActionListener(e -> {
+            gameBoard.removeAll();
+            populateGameBoard(gameBoard, solution);
+            gameBoard.revalidate();
+            gameBoard.repaint();
+        });
+
         JPanel controls = new JPanel(new FlowLayout());
 
         controls.add(new JLabel("Difficulty:"));
