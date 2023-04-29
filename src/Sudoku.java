@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class Sudoku extends JFrame {
@@ -11,6 +13,10 @@ public class Sudoku extends JFrame {
     private  int level = 1;
     private JComboBox<String> difficultyComboBox;
     private JPanel gameBoard;
+    private static int secondsPassed = 0;
+    private JLabel timerLabel;
+
+    private Timer timer;
 
     public static void main(String[] args) {
         new Sudoku();
@@ -36,6 +42,7 @@ public class Sudoku extends JFrame {
                 generateBoard();
                 populateGameBoard(gameBoard, board);
                 gameBoard.revalidate();
+                secondsPassed = 0;
 
             }
 
@@ -58,7 +65,9 @@ public class Sudoku extends JFrame {
             populateGameBoard(gameBoard, board);
             gameBoard.revalidate();
             gameBoard.repaint();
+            secondsPassed = 0;
         });
+
         JButton showButton = new JButton("Show Solution");
         showButton.addActionListener(e -> {
             gameBoard.removeAll();
@@ -67,19 +76,38 @@ public class Sudoku extends JFrame {
             gameBoard.repaint();
         });
 
+
+        timerLabel = new JLabel("00:00", SwingConstants.CENTER);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        timerLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                secondsPassed++;
+                int minutes = secondsPassed / 60;
+                int seconds = secondsPassed % 60;
+                String timeString = String.format("%02d:%02d", minutes, seconds);
+                timerLabel.setText(timeString);
+            }
+        });
+
         JPanel controls = new JPanel(new FlowLayout());
 
         controls.add(new JLabel("Difficulty:"));
         controls.add(difficultyComboBox);
         controls.add(checkButton);
         controls.add(showButton);
+        controls.add(new JLabel("Time:"));
+        controls.add(timerLabel);
+
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(gameBoard, BorderLayout.CENTER);
         getContentPane().add(controls, BorderLayout.SOUTH);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setSize(800, 800);
         setVisible(true);
+        timer.start();
     }
 
     private void generateBoard() {
