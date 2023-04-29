@@ -17,12 +17,15 @@ public class Sudoku extends JFrame {
     private JLabel timerLabel;
 
     private Timer timer;
+    private JLabel bestScoreLabel;
+    private int bestScore = 0;
 
     public static void main(String[] args) {
         new Sudoku();
     }
 
     public Sudoku() {
+
         gameBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
         generateBoard();
         populateGameBoard(gameBoard, board);
@@ -30,20 +33,26 @@ public class Sudoku extends JFrame {
         JButton checkButton = new JButton("Check Solution");
         checkButton.addActionListener(e -> {
 
+            String value = difficultyComboBox.getSelectedItem().toString();
+            int myScore = checkScore(value);
+            System.out.println(secondsPassed);
 
             if (!checkSolution()) {
                 JOptionPane.showMessageDialog(null,
                         "Your solution is NOT correct!");
             } else {
                 JOptionPane.showMessageDialog(null,
-                        "Your solution is correct! Your score is ");
+                        "Your solution is correct! Your score is " + myScore);
+                if (myScore > bestScore) {
+                    bestScore = myScore;
+                }
 
                 gameBoard.removeAll();
                 generateBoard();
                 populateGameBoard(gameBoard, board);
                 gameBoard.revalidate();
                 secondsPassed = 0;
-
+                bestScoreLabel.setText(String.valueOf(bestScore));
             }
 
         });
@@ -91,6 +100,9 @@ public class Sudoku extends JFrame {
             }
         });
 
+        bestScoreLabel = new JLabel();
+        bestScoreLabel.setText(String.valueOf(bestScore));
+
         JPanel controls = new JPanel(new FlowLayout());
 
         controls.add(new JLabel("Difficulty:"));
@@ -99,6 +111,8 @@ public class Sudoku extends JFrame {
         controls.add(showButton);
         controls.add(new JLabel("Time:"));
         controls.add(timerLabel);
+        controls.add(new JLabel("Best Score:"));
+        controls.add(bestScoreLabel);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(gameBoard, BorderLayout.CENTER);
@@ -260,6 +274,27 @@ public class Sudoku extends JFrame {
             }
         }
         return true;
+    }
+
+    private int checkScore(String value) {
+        int baseScore = 0;
+        double coefficient = 0;
+        int maxTime = 0;
+        if (value == "Easy") {
+            baseScore = 100;
+            coefficient = 5;
+            maxTime = 5;
+        } else if (value == "Medium") {
+            baseScore = 200;
+            coefficient = 600;
+            maxTime = 10;
+        } else {
+            baseScore = 300;
+            coefficient = 900;
+            maxTime = 15;
+        }
+        int myScore = (int) (baseScore - (((double)(secondsPassed/60) - maxTime) * coefficient));
+        return myScore;
     }
 }
 
