@@ -61,6 +61,24 @@ public class Sudoku extends JFrame {
             generateBoard();
         }
 
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                solution[i][j] = board[i][j];
+            }
+        }
+
+        int numLocked = 30;
+
+        while (numLocked > 0) {
+            int row = rand.nextInt(9);
+            int col = rand.nextInt(9);
+            if (!locked[row][col]) {
+                locked[row][col] = true;
+                numLocked--;
+                board[row][col] = 0;
+            }
+        }
+
     }
     private boolean isValid(int row, int col, int val) {
         for (int i = 0; i < BOARD_SIZE; i++) {
