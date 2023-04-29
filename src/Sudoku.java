@@ -19,6 +19,7 @@ public class Sudoku extends JFrame {
     private Timer timer;
     private JLabel bestScoreLabel;
     private int bestScore = 0;
+    private int hintCount = 0;
 
     public static void main(String[] args) {
         new Sudoku();
@@ -30,13 +31,19 @@ public class Sudoku extends JFrame {
         generateBoard();
         populateGameBoard(gameBoard, board);
 
+        JButton hintButton = new JButton("Hint!");
+        hintButton.addActionListener(e -> {
+            makeHint();
+            hintCount++;
+        });
+
         JButton checkButton = new JButton("Check Solution");
         checkButton.addActionListener(e -> {
 
             String value = difficultyComboBox.getSelectedItem().toString();
             int myScore = checkScore(value);
             System.out.println(secondsPassed);
-
+            System.out.println(hintCount);
             if (!checkSolution()) {
                 JOptionPane.showMessageDialog(null,
                         "Your solution is NOT correct!");
@@ -51,7 +58,9 @@ public class Sudoku extends JFrame {
                 generateBoard();
                 populateGameBoard(gameBoard, board);
                 gameBoard.revalidate();
+
                 secondsPassed = 0;
+                hintCount = 0;
                 bestScoreLabel.setText(String.valueOf(bestScore));
             }
 
@@ -104,7 +113,7 @@ public class Sudoku extends JFrame {
         bestScoreLabel.setText(String.valueOf(bestScore));
 
         JPanel controls = new JPanel(new FlowLayout());
-
+        controls.add(hintButton);
         controls.add(new JLabel("Difficulty:"));
         controls.add(difficultyComboBox);
         controls.add(checkButton);
@@ -129,7 +138,6 @@ public class Sudoku extends JFrame {
         solution = new int[BOARD_SIZE][BOARD_SIZE];
         locked = new boolean[BOARD_SIZE][BOARD_SIZE];
         Random rand = new Random();
-
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -234,8 +242,6 @@ public class Sudoku extends JFrame {
             }
         }
 
-
-
         board[row][col] = 0;
         return false;
     }
@@ -276,6 +282,23 @@ public class Sudoku extends JFrame {
         return true;
     }
 
+    private  void makeHint() {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                Component component = gameBoard.getComponent(row * BOARD_SIZE + col);
+                if (component instanceof JTextField) {
+                    JTextField textField = (JTextField) component;
+                    String value = textField.getText();
+                    if (value.equals("")) {
+                        textField.setText(String.valueOf(solution[row][col]));
+                        return;
+                    }
+                }
+            }
+        }
+
+    }
+
     private int checkScore(String value) {
         int baseScore = 0;
         double coefficient = 0;
@@ -294,6 +317,7 @@ public class Sudoku extends JFrame {
             maxTime = 15;
         }
         int myScore = (int) (baseScore - (((double)(secondsPassed/60) - maxTime) * coefficient));
+        myScore -= hintCount;
         return myScore;
     }
 }
